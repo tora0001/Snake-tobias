@@ -10,8 +10,18 @@ function start() {
 
   document.addEventListener("keydown", keyDown);
 
+  spawnFood();
+
   // start ticking
   tick();
+}
+
+let timer;
+
+function spawnFood() {
+  food.row = Math.floor(Math.random() * 9);
+  food.col = Math.floor(Math.random() * 9);
+  writeToCell(food.row, food.col, 2);
 }
 
 function keyDown(event) {
@@ -37,7 +47,7 @@ function keyDown(event) {
 
 function tick() {
   // setup next tick
-  setTimeout(tick, 500);
+  timer = setTimeout(tick, 300);
 
   for (const part of queue) {
     writeToCell(part.row, part.col, 0);
@@ -75,6 +85,14 @@ function tick() {
       break;
   }
 
+  for (const segment of queue) {
+    if (head.row === segment.row && head.col === segment.col) {
+      queue.length = 0;
+      clearTimeout(timer);
+      alert("Du tabte... Refresh for at genstarte");
+    }
+  }
+
   queue.push(head);
 
   queue.shift();
@@ -82,6 +100,13 @@ function tick() {
   for (const part of queue) {
     writeToCell(part.row, part.col, 1);
   }
+
+  if (food.row == head.row && food.col == head.col) {
+    writeToCell(food.row, food.col, 0);
+    queue.push(head);
+    setTimeout(spawnFood, 1000);
+  }
+
   // display the model in full
   displayBoard();
 }
@@ -117,6 +142,11 @@ const queue = [
     col: 5,
   },
 ];
+
+let food = {
+  row: Math.floor(Math.random() * 9),
+  col: Math.floor(Math.random() * 9),
+};
 
 let direction = "left";
 
